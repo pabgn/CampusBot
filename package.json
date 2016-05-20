@@ -1,0 +1,26 @@
+{
+  "name": "campusbot",
+  "version": "1.0.0",
+  "description": "Real-time control of a robot in Campus Party Europe 2016",
+  "main": "app.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pabgn/CampusBot"
+  },
+  "keywords": [
+    "campusbot"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pabgn/CampusBot/issues"
+  },
+  "homepage": "https://github.com/pabgn/CampusBot",
+  "dependencies": {
+    "express": "^4.13.4",
+    "socketio": "^1.0.0"
+  }
+}
