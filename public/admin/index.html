@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>Admin</title>
+		<script src="/assets/js/jquery.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<style>
+			.status{
+				color:red;
+			}
+			.connected{
+				color:green;
+			}	
+		</style>
+		<script type="text/javascript" charset="utf-8">
+		    var socket = io.connect('http://' + document.domain + ':' + location.port);
+		    socket.on('connect', function() {
+		      $("#status").html("CONNECTED");
+		      $("#status").addClass("connected");
+		      
+		    });
+		</script>
+	</head>
+	<body>
+		<h1>Admin</h1>
+		
+		<b>Status: </b> <span id="status">DISCONNECTED</span><br>
+		
+		Secret: <input type="text" id="secret"><br>
+		
+		<h3>Actions</h3>
+		<input type="button" value="Sleep mode" id="sleep"><br>
+		<input type="button" value="Wake up" id="wakeup"><br>
+		<input type="button" value="Kick current user" id="kick"><br>
+		
+	</body>
+	<script>
+		$("#sleep").click(function(){
+			sendAdmin('sleep'); 
+		});
+		
+		$("#wakeup").click(function(){
+			sendAdmin('wakeup');   
+		});	
+
+		$("#kick").click(function(){
+			sendAdmin('kick');   
+		});	
+				
+		function sendAdmin(action){
+			socket.emit('admin', {'action': action, 'secret':$("#secret").val()});   			
+		}
+	</script>
+</html>

@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Lens by HTML5 UP</title>
+		<title>CampusBot</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -17,8 +17,9 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript" charset="utf-8">
 		    var socket = io.connect('http://' + document.domain + ':' + location.port);
+		    var playing = false;
+		    var waiting = false;
 		    socket.on('connect', function() {
-		       // socket.emit('my event', {data: 'I\'m connected!'});
 		    });
 		    
 		    socket.on('position', function(data){
@@ -29,19 +30,34 @@
 				$("#watching_number").html(data["watchers"]);
 				$("#queue_title").html("Queue:");		   
 				$("#queue_number").html(data["queue"]);	
+				if(data["sleeping"]){
+					$("#play_button").hide();
+				}else{
+					if(!playing && !waiting){
+						$("#play_button").show();
+					}
+				}
 
 			});
 			socket.on('control', function(data){
-				alert("it's my turnnnn");
+				playing = true;
+				waiting = false;
+				$( "body" ).bind("keypress", function( event ) {
+					socket.emit('move', {key: event.which});
+				});
 			
 			});
 			
 			socket.on('over', function(data){
-				alert("TIME OVER");
+				playing = false;
+				$("#play_button").show();
+				$("body").unbind("keypress");
 			
 			});
 			
 			function play(){
+				waiting = true;
+				$("#play_button").hide();
 				socket.emit("play");
 			}
 			
@@ -85,7 +101,7 @@
 					<header id="header">
 						<h1>CampusBot</h1>
 						<p>Play with our robot!</a></p>
-						<input type="button" onClick="play();" value="Play" style="width:100%">
+						<input id="play_button" type="button" onClick="play();" value="Play" style="width:100%">
 						<div></div>
 						
 						<br>
