@@ -20,9 +20,6 @@ fs.readFile('secret.txt', 'utf8', function (err,data) {
 
 app.use('/', express.static('public'));
 
-
-
-
 io.on('connection', function(socket){
 	
 	sendTotalUsers();

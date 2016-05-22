@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<!--
+	Lens by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>CampusBot</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" charset="utf-8">
+		    var socket = io.connect('http://' + document.domain + ':' + location.port);
+		    var playing = false;
+		    var waiting = false;
+		    socket.on('connect', function() {
+		    });
+		    
+		    socket.on('position', function(data){
+			 	$("#queue_title").html("My position:");		   
+				$("#queue_number").html(data["number"]);	   
+			});
+		    socket.on('totalUsers', function(data){
+				$("#watching_number").html(data["watchers"]);
+				$("#queue_title").html("Queue:");		   
+				$("#queue_number").html(data["queue"]);	
+				if(data["sleeping"]){
+					$("#play_button").hide();
+				}else{
+					if(!playing && !waiting){
+						$("#play_button").show();
+					}
+				}
+
+			});
+			socket.on('control', function(data){
+				playing = true;
+				waiting = false;
+				$( "body" ).bind("keypress", function( event ) {
+					socket.emit('move', {key: event.which});
+				});
+			
+			});
+			
+			socket.on('over', function(data){
+				playing = false;
+				$("#play_button").show();
+				$("body").unbind("keypress");
+			
+			});
+			
+			function play(){
+				waiting = true;
+				$("#play_button").hide();
+				socket.emit("play");
+			}
+			
+		    
+		</script>
+		<style>
+			#overlay{
+				position:absolute;
+				width:100%;
+				
+			}
+			#watching{
+				font-size:25px;
+				color:white;
+				margin-left:10px;
+				margin-top:10px;
+				float:left;
+			}
+			#queue{
+				float:right;
+				margin-right:10px;
+				margin-top:10px;
+				color:white;
+				font-size: 25px;
+			}
+		</style>
+	</head>
+	<body class="is-loading-0 is-loading-1 is-loading-2">
+	<div id="viewer">
+		<div id="overlay">
+			<div id="watching">Watching: <span id="watching_number">100</span></div>
+			<div id="queue"><span id="queue_title">Queue:</span> <span id="queue_number">100</span></div>
+			
+		</div>
+		<img src="images/img.jpg">
+	</div>
+		<!-- Main -->
+			<div id="main">
+
+				<!-- Header -->
+					<header id="header">
+						<h1>CampusBot</h1>
+						<p>Play with our robot!</a></p>
+						<input id="play_button" type="button" onClick="play();" value="Play" style="width:100%">
+						<div></div>
+						
+						<br>
+						<ul class="icons">
+							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
+							<li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+						</ul>
+					</header>
+				<!-- Footer -->
+					<footer id="footer">
+						<ul class="copyright">
+							<li>&copy; Untitled.</li><li>With <3 from Spain</li>
+						</ul>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
