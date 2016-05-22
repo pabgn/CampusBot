@@ -59,7 +59,9 @@ io.on('connection', function(socket){
 
 });
 function kick(){
+	playing.emit("over");
 	playing = null;
+	
 }
 function wakeUp(){
 	sleeping=false;

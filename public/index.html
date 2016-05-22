@@ -37,6 +37,7 @@
 			padding-left:30px;
 			padding-right:30px;
 			width: calc(100% - 60px);
+			-webkit-overflow-scrolling: touch;
 		}
 		.third{
 			width:33%;
@@ -222,12 +223,12 @@
 		    
 		    socket.on('position', function(data){
 			    position = data["number"];
-			    seconds = position*seconds_play;
-				$("#wait").html(seconds_play+" seconds left");
+			    seconds = parseInt(position)*seconds_play;
+				$("#wait").html(seconds+" seconds left");
 			    if(countDown!=null) { clearTimeout(countDown); countDown=null;}
 			    countDown = setInterval(function(){
-				    seconds_play--;
-					$("#wait").html(seconds_play+" seconds left");
+				    seconds--;
+					$("#wait").html(seconds+" seconds left");
 				    
 			    }, 1000);
 			});
@@ -235,8 +236,10 @@
 				$("#watching").html(data["watchers"]);
 				$("#queue").html(data["queue"]);	
 				if(data["sleeping"]){
+					$("#sleeping").show();
 					$("#play_button").hide();
 				}else{
+					$("#sleeping").hide();
 					if(!playing && !waiting){
 						$("#play_button").show();
 					}
@@ -259,7 +262,7 @@
 					    $(this).removeClass("is-hover");
 					    next();
 					});
-					socket.emit('move', {key: event.which});
+					move(c);
 				});
 			
 			});
@@ -278,6 +281,9 @@
 				$(".time-wrapper").show();
 				socket.emit("play");
 			}
+			function move(d){
+				socket.emit('move', {key: d});	
+			}
 			
 		    
 		</script>
@@ -291,12 +297,13 @@
 			<div class="options-container">
 				<div class="third"> <span class="icon watching"></span><span class="text-detail" id="watching"></span></div>
 				<div class="third centered">
+				<div id="sleeping" class="hidden">We'll be back soon!</div>
 				<div class="time-wrapper hidden"><span class="icon waiting"></span> <span class="text-detail" id="wait"></span> </div>
 				
 				<div id="play_button" class="button" onClick="play();">Play</div>
 				<div id="controls" class="hidden">
-					<div class="key-row"> <div class="key arrow up"></div></div>
-					<div class="keys-row"><div class="key-wrapper"> <div class="key arrow left space"></div> <div class="key arrow down space"></div> <div class="key arrow right"></div> </div></div>
+					<div class="key-row"> <div class="key arrow up" onClick="move('up');"></div></div>
+					<div class="keys-row"><div class="key-wrapper"> <div class="key arrow left space" onClick="move('left');"></div> <div class="key arrow down space" onClick="move('down');"></div> <div class="key arrow right" onClick="move('right');"></div> </div></div>
 				</div>
 				</div>
 				<div class="third"><div class="stick-right"><span class="icon queue"></span> <span class="text-detail" id="queue"></span> </div></div>
