@@ -2,7 +2,17 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var fs = require('fs')
+var fs = require('fs');
+var PythonShell = require('python-shell');
+var pyshell = new PythonShell('python/app.py');
+
+
+
+pyshell.on('message', function (message) {
+  console.log(message);
+});
+     
+
 
 var port = 3000;
 var queue = []
@@ -38,7 +48,7 @@ io.on('connection', function(socket){
 	});
 	socket.on('move', function(data){
 		if(playing===socket){
-			console.log(data);
+			pyshell.send(data["key"]);
 		}
 	});
 	
