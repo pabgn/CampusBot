@@ -2,8 +2,10 @@
 	<head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<title>CampusBot</title>
+		<script src="js/gyro.min.js"></script>
 	</head>
 	<style>
+
 		@font-face {
 		  font-family: 'Avenir-Heavy';
 		  src: url('fonts/Avenir-Heavy.eot?#iefix') format('embedded-opentype'),  url('fonts/Avenir-Heavy.woff') format('woff'), url('fonts/Avenir-Heavy.ttf')  format('truetype'), url('fonts/Avenir-Heavy.svg#Avenir-Heavy') format('svg');
@@ -218,6 +220,7 @@
 		    var position = null;
 		    var seconds = null;
 		    var seconds_play = 10;
+		    var pressing = [];
 		    socket.on('connect', function() {
 		    });
 		    
@@ -254,19 +257,26 @@
 				$(".time-wrapper").hide();
 				$("#controls").show();
 				$( "body" ).bind("keydown", function( event ) {
-					if(event.which==38){ c = "up"; }
-					if(event.which==37){ c = "left"; }
-					if(event.which==40){ c = "down"; }
-					if(event.which==39){ c = "right"; }	
-					 $('.'+c).addClass('is-hover').delay(100).queue(function(next){
-					    $(this).removeClass("is-hover");
-					    next();
-					});
-					move(c);
+					c = keyToClass(event.which);
+					 $('.'+c).addClass('is-hover');	
+					 if(pressing.indexOf(c)==-1){
+						 pressing.push(c);
+					 }				
+					 move(pressing);
+				});
+				$( "body" ).bind("keyup", function( event ) {
+					 $('.'+keyToClass(event.which)).removeClass('is-hover');
+					 i = pressing.indexOf(keyToClass(event.which));
+					 pressing.splice(i, 1);								
 				});
 			
 			});
-			
+			function keyToClass(key){
+				if(key==38){ return "up"; }
+				if(key==37){ return "left"; }
+				if(key==40){ return "down"; }
+				if(key==39){ return "right"; }	
+			}
 			socket.on('over', function(data){
 				playing = false;
 				$("#controls").hide();
@@ -282,10 +292,44 @@
 				socket.emit("play");
 			}
 			function move(d){
-				socket.emit('move', {key: d});	
+				socket.emit('move', {keys: d});	
 			}
-			
-		    
+			function triggerKey(n){
+				var e = $.Event('keydown');
+			    e.which = n; 
+			    console.log(e);
+			    $('body').trigger(e);
+			}
+			function releaseKey(n){
+				var e = $.Event('keyup');
+			    e.which = n; 
+			    $('body').trigger(e);
+			}
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			gyro.startTracking(function(o) {
+			var b = document.getElementById('example'),
+					f = document.getElementById('features');
+			//f.innerHTML = gyro.getFeatures();
+			// o.gamma  -> inclinación: aceleración -> up
+			// o.alpha -> negativa -> giro izquerda -> left
+			// o.alpha -> positiva -> girdo derecha -> right
+			if(playing){
+				if(o.gamma<50){ triggerKey(38); } else { releaseKey(38); }
+				if(o.beta>15){  triggerKey(37); } else { releaseKey(37); }
+				if(o.beta<-15){  triggerKey(39); } else { releaseKey(39); }
+				//if(o.gamma>80){ triggerKey(40); } else { releaseKey(40); }			
+			}
+			});
+			}
+			/*
+			console.log("<p> x = " + o.x + "</p>" +
+										"<p> y = " + o.y + "</p>" +
+										"<p> z = " + o.z + "</p>" +
+										"<p> alpha = " + o.alpha + "</p>" +
+										"<p> beta = " + o.beta + "</p>" +
+										"<p> gamma = " + o.gamma + "</p>");
+			});
+		    */
 		</script>
 		
 	<body>

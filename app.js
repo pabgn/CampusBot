@@ -48,7 +48,8 @@ io.on('connection', function(socket){
 	});
 	socket.on('move', function(data){
 		if(playing===socket){
-			pyshell.send(data["key"]);
+			console.log(data["keys"]);
+			//pyshell.send(data["key"]);
 		}
 	});
 	
