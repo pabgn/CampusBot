@@ -9,6 +9,7 @@ Features
 
 - Real-time interface and control with SocketIO
 - Waiting queue
+- Mobile support with gyro data
 - Admin interface
 - NXT-Python bridge
 - Live video feed
